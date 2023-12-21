@@ -1,10 +1,12 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(slamware_ros_sdk)
 
-add_definitions(-DBOOST_BIND_GLOBAL_PLACEHOLDERS)
+# add_definitions(-DBOOST_BIND_GLOBAL_PLACEHOLDERS)
+
+
 
 find_path(slamware_sdk_INCLUDE_DIR rpos/rpos.h ${CMAKE_CURRENT_SOURCE_DIR}/../slamware_sdk/include)
-find_path(slamware_sdk_LIBRARY librpos_framework.a ${CMAKE_CURRENT_SOURCE_DIR}/../slamware_sdk/lib/linux-aarch64)
+find_path(slamware_sdk_LIBRARY librpos_framework.a ${CMAKE_CURRENT_SOURCE_DIR}/../slamware_sdk/lib/linux-aarch64-new)
 if(slamware_sdk_INCLUDE_DIR AND slamware_sdk_LIBRARY)
   set(SLTC_SDK_INC_DIR "${slamware_sdk_INCLUDE_DIR}")
   set(SLTC_SDK_LIB_DIR "${slamware_sdk_LIBRARY}")
@@ -19,6 +21,8 @@ else(slamware_sdk_INCLUDE_DIR AND slamware_sdk_LIBRARY)
 endif(slamware_sdk_INCLUDE_DIR AND slamware_sdk_LIBRARY)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -std=gnu++11")
+
+find_package(Boost REQUIRED COMPONENTS atomic chrono date_time regex random thread)
 
 find_package(catkin REQUIRED COMPONENTS
   nav_msgs
@@ -130,9 +134,11 @@ add_executable(slamware_ros_sdk_server_node
   src/server/slamware_ros_sdk_server.cpp
 )
 add_dependencies(slamware_ros_sdk_server_node ${PROJECT_NAME}_generate_messages_cpp)
+
 target_include_directories(slamware_ros_sdk_server_node
-  PRIVATE ${SLTC_SDK_INC_DIR}
+  PRIVATE ${SLTC_SDK_INC_DIR}  ${Boost_INCLUDE_DIRS}
 )
+
 target_compile_options(slamware_ros_sdk_server_node
   PRIVATE -Wno-deprecated-declarations
 )
@@ -146,12 +152,18 @@ target_link_libraries(slamware_ros_sdk_server_node
   ${SLTC_SDK_LIB_DIR}/libcares.a
   ${SLTC_SDK_LIB_DIR}/libssl.a
   ${SLTC_SDK_LIB_DIR}/libcrypto.a
-  ${SLTC_SDK_LIB_DIR}/libboost_atomic.a
-  ${SLTC_SDK_LIB_DIR}/libboost_chrono.a
-  ${SLTC_SDK_LIB_DIR}/libboost_date_time.a
-  ${SLTC_SDK_LIB_DIR}/libboost_regex.a 
-  ${SLTC_SDK_LIB_DIR}/libboost_thread.a
-  ${SLTC_SDK_LIB_DIR}/libboost_random.a
+  Boost::atomic
+  Boost::chrono
+  Boost::date_time
+  Boost::regex
+  Boost::thread
+  Boost::random
+#  ${SLTC_SDK_LIB_DIR}/libboost_atomic.a
+#  ${SLTC_SDK_LIB_DIR}/libboost_chrono.a
+#  ${SLTC_SDK_LIB_DIR}/libboost_date_time.a
+#  ${SLTC_SDK_LIB_DIR}/libboost_regex.a 
+#  ${SLTC_SDK_LIB_DIR}/libboost_thread.a
+#  ${SLTC_SDK_LIB_DIR}/libboost_random.a
   ${catkin_LIBRARIES}
   z
   pthread
