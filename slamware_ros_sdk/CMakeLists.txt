@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(slamware_ros_sdk)
 
+add_definitions(-DBOOST_BIND_GLOBAL_PLACEHOLDERS)
+
 find_path(slamware_sdk_INCLUDE_DIR rpos/rpos.h ${CMAKE_CURRENT_SOURCE_DIR}/../slamware_sdk/include)
 find_path(slamware_sdk_LIBRARY librpos_framework.a ${CMAKE_CURRENT_SOURCE_DIR}/../slamware_sdk/lib/linux-aarch64)
 if(slamware_sdk_INCLUDE_DIR AND slamware_sdk_LIBRARY)
